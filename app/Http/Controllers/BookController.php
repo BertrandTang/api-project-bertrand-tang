@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\BookResource;
 use App\Models\Book;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
 
 class BookController extends Controller
@@ -14,7 +15,9 @@ class BookController extends Controller
      */
     public function index()
     {
-        $books = Book::all();
+        $books = Cache::remember('books-list', 3600, function () {
+            return Book::paginate(2);
+        });
 
         return BookResource::collection($books);
     }
@@ -33,6 +36,8 @@ class BookController extends Controller
         ]);
 
         $book = Book::create($validated);
+
+        Cache::forget('books-list');
 
         return new BookResource($book);
     }
@@ -65,6 +70,8 @@ class BookController extends Controller
 
         $book->update($validated);
 
+        Cache::forget('books-list');
+
         return new BookResource($book);
     }
 
@@ -73,6 +80,8 @@ class BookController extends Controller
      */
     public function destroy(Book $book)
     {
+        Cache::forget('books-list');
+
         $book->delete();
 
         return response()->noContent();
