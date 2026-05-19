@@ -15,9 +15,7 @@ class BookController extends Controller
      */
     public function index()
     {
-        $books = Cache::remember('books-list', 3600, function () {
-            return Book::paginate(2);
-        });
+        $books = Book::paginate(2);
 
         return BookResource::collection($books);
     }
@@ -37,8 +35,6 @@ class BookController extends Controller
 
         $book = Book::create($validated);
 
-        Cache::forget('books-list');
-
         return new BookResource($book);
     }
 
@@ -47,6 +43,12 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
+        $id = $book->id;
+
+        $book = Cache::remember("book.{$id}", 3600, function () use ($id) {
+            return Book::find($id);
+        });
+
         return new BookResource($book);
     }
 
@@ -70,8 +72,6 @@ class BookController extends Controller
 
         $book->update($validated);
 
-        Cache::forget('books-list');
-
         return new BookResource($book);
     }
 
@@ -80,8 +80,6 @@ class BookController extends Controller
      */
     public function destroy(Book $book)
     {
-        Cache::forget('books-list');
-
         $book->delete();
 
         return response()->noContent();
