@@ -53,7 +53,7 @@ class BookCreationTest extends TestCase
         $response->assertStatus(422);
 
         $this->assertDatabaseMissing('books', [
-            'title' => $bookData['title'],
+            'isbn' => $bookData['isbn'],
         ]);
     }
 
@@ -71,7 +71,7 @@ class BookCreationTest extends TestCase
         $response->assertStatus(401);
 
         $this->assertDatabaseMissing('books', [
-            'title' => $bookData['title'],
+            'isbn' => $bookData['isbn'],
         ]);
     }
 }
