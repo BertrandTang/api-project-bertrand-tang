@@ -1,0 +1,457 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Orpheus",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/v1/books": {
+            "get": {
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Liste des livres",
+                "description": "Retourne la liste paginée des livres (2 par page). Route publique, sans authentification.",
+                "operationId": "28a70a9e44693b51173a186612e08519",
+                "parameters": [
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "application/json"
+                        },
+                        "example": "application/json"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Numéro de page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste paginée",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "data": [
+                                        {
+                                            "title": "1984",
+                                            "author": "GEORGE ORWELL",
+                                            "summary": "Roman dystopique...",
+                                            "isbn": "9782070368228",
+                                            "_links": {
+                                                "self": "http://127.0.0.1:8000/api/v1/books/1",
+                                                "update": "http://127.0.0.1:8000/api/v1/books/1",
+                                                "delete": "http://127.0.0.1:8000/api/v1/books/1",
+                                                "all": "http://127.0.0.1:8000/api/v1/books"
+                                            }
+                                        }
+                                    ],
+                                    "links": {
+                                        "first": "http://127.0.0.1:8000/api/v1/books?page=1",
+                                        "last": "http://127.0.0.1:8000/api/v1/books?page=2",
+                                        "prev": null,
+                                        "next": "http://127.0.0.1:8000/api/v1/books?page=2"
+                                    },
+                                    "meta": {
+                                        "current_page": 1,
+                                        "per_page": 2,
+                                        "total": 3
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Création d'un livre",
+                "description": "Crée un livre et l'ajoute en base. Route protégée : token Bearer Sanctum requis.",
+                "operationId": "a94e5fc35c07fc7703157dbcecc23dda",
+                "parameters": [
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "application/json"
+                        },
+                        "example": "application/json"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "author",
+                                    "summary",
+                                    "isbn"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "1984",
+                                        "maxLength": 255,
+                                        "minLength": 3
+                                    },
+                                    "author": {
+                                        "type": "string",
+                                        "example": "George Orwell",
+                                        "maxLength": 100,
+                                        "minLength": 3
+                                    },
+                                    "summary": {
+                                        "type": "string",
+                                        "example": "Roman dystopique dans une société totalitaire.",
+                                        "maxLength": 500,
+                                        "minLength": 10
+                                    },
+                                    "isbn": {
+                                        "type": "string",
+                                        "example": "9782070368228"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "example": {
+                                "title": "1984",
+                                "author": "George Orwell",
+                                "summary": "Roman dystopique dans une société totalitaire.",
+                                "isbn": "9782070368228"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Livre créé",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "title": "1984",
+                                    "author": "GEORGE ORWELL",
+                                    "summary": "Roman dystopique dans une société totalitaire.",
+                                    "isbn": "9782070368228",
+                                    "_links": {
+                                        "self": "http://127.0.0.1:8000/api/v1/books/1",
+                                        "update": "http://127.0.0.1:8000/api/v1/books/1",
+                                        "delete": "http://127.0.0.1:8000/api/v1/books/1",
+                                        "all": "http://127.0.0.1:8000/api/v1/books"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "Unauthenticated."
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "The isbn has already been taken.",
+                                    "errors": {
+                                        "isbn": [
+                                            "The isbn has already been taken."
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Inscription",
+                "description": "Crée un nouvel utilisateur. Le mot de passe est hashé automatiquement.",
+                "operationId": "9dfe3274bd4be321d334685cceeb6324",
+                "parameters": [
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "application/json"
+                        },
+                        "example": "application/json"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Jean Dupont",
+                                        "maxLength": 255
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "jean@example.com",
+                                        "maxLength": 255
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123",
+                                        "minLength": 8
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "example": {
+                                "name": "Jean Dupont",
+                                "email": "jean@example.com",
+                                "password": "password123"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Utilisateur créé",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "User created successfully",
+                                    "user": {
+                                        "id": 1,
+                                        "name": "Jean Dupont",
+                                        "email": "jean@example.com",
+                                        "email_verified_at": null,
+                                        "created_at": "2026-05-18T10:00:00.000000Z",
+                                        "updated_at": "2026-05-18T10:00:00.000000Z"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "The email has already been taken.",
+                                    "errors": {
+                                        "email": [
+                                            "The email has already been taken."
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Connexion",
+                "description": "Authentifie un utilisateur et retourne un token Bearer Sanctum.",
+                "operationId": "4f674e7e0004dd3bd65791acc7ff50db",
+                "parameters": [
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "application/json"
+                        },
+                        "example": "application/json"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "jean@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "example": {
+                                "email": "jean@example.com",
+                                "password": "password123"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Connexion réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "Logged in successfully",
+                                    "token": "1|abcdefghijklmnopqrstuvwxyz"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Identifiants invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "Identifiants invalides"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "The email field is required.",
+                                    "errors": {
+                                        "email": [
+                                            "The email field is required."
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Déconnexion",
+                "description": "Révoque le token Sanctum courant (Bearer obligatoire).",
+                "operationId": "59621a197ca90c93814e3476afaf02c0",
+                "parameters": [
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "application/json"
+                        },
+                        "example": "application/json"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Déconnexion réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "Logged out successfully"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "Unauthenticated."
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "sanctum": {
+                "type": "http",
+                "description": "Token Sanctum obtenu via POST /api/v1/login (Authorization: Bearer {token})",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Books",
+            "description": "Books"
+        },
+        {
+            "name": "Auth",
+            "description": "Auth"
+        }
+    ]
+}
